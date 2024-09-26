@@ -1,0 +1,33 @@
+#include <iostream>
+using namespace std;
+
+struct Vector{
+    int sz; 
+    double* elem;
+};
+
+void vector_init(Vector& v, int s){
+	v.elem = new double[s]; // s개의 double을 저장할 수 있는 배열을 할당
+	v.sz = s;  // sz에 원소의 개수를 저장
+};
+
+
+double read_and_sum(int s){
+    Vector v;
+    vector_init(v,s);
+
+    for(int i=0; i!=s; ++i)
+        cin >> v.elem[i];
+
+    double sum = 0;
+    for(int i=0; i!=s; ++i)
+        sum += v.elem[i];
+
+    return sum;
+}
+
+int main(){
+    cout << read_and_sum(5);
+}
+    
+

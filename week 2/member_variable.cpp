@@ -16,6 +16,7 @@ class Rectangle{
         int getArea(){
             return width*height;
         }
+        // compile 시간이 길어질 수 있음
     
 };
 

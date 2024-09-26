@@ -11,6 +11,8 @@ class Car{
 
     public:
     // setter 함수: 외부에서 변수에 안전하게 값을 설정하는 함수
+
+
     void setModel(string b) {
         model = b;
     }
@@ -39,9 +41,9 @@ int main(){
     //person1.year = 2024;
     person1.setYear(2024);
     
-    std::cout << "model: " << person1.getModel() << endl;
+    cout << "model: " << person1.getModel() << endl;
 
-    std::cout << "year: " << person1.getYear() << endl;
+    cout << "year: " << person1.getYear() << endl;
 
     return 0;
 
