@@ -34,6 +34,7 @@ public:
 	 string getIpAddr() { return ipAddr; }
 };
 
+// 객체 htv가 생생될 때, 생성자 SmartTV()가 호출, 클래스 WideTV 상속받고 있으므로, WideTV의 생성자 호출
 int main(){
     SmartTV htv("192.0.0.1", 32);
     cout << "size= " << htv.getSize() << endl;
