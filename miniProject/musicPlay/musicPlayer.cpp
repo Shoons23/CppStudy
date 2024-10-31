@@ -100,6 +100,11 @@ public:
         bool operator!=(const Iterator& other) const {
             return current != other.current;
         }
+
+        // == 연산자 추가
+        bool operator==(const Iterator& other) const {
+            return current == other.current;
+        }
     private:
         node_ptr current;
     };
@@ -149,7 +154,15 @@ public:
             mpg123_exit();
         }
     }
-
+    // MP3 파일의 총 재생 시간 가져오기
+       sf::Time getDuration() const {
+        off_t length = mpg123_length(mh); // 단일 인수로 호출하여 길이를 가져옵니다.
+        if (length < 0) {
+            std::cerr << "MP3 파일 길이를 가져오는 데 실패했습니다: " << mpg123_plain_strerror(err) << std::endl;
+            return sf::Time::Zero; // 오류가 발생하면 0으로 반환합니다.
+        }
+        return sf::seconds(static_cast<float>(length) / rate); // 재생 시간을 sf::Time 형식으로 반환합니다.
+    }
 protected:
     virtual bool onGetData(Chunk& data) override {
         size_t bytesRead;
@@ -172,7 +185,7 @@ private:
     int channels, encoding;
     const size_t bufferSize;
     std::vector<short> buffer;
-};
+}
 
 // playlist 구조체 정의
 struct playlist {
@@ -201,7 +214,7 @@ struct playlist {
                 music.play();
 
                 while (music.getStatus() == sf::Music::Playing) {
-                    sf::sleep(sf::milliseconds(100));
+                    sf::sleep(sf::milliseconds(1000));
                 }
             }
             else if (song.size() >= 4 && song.substr(song.size() - 4) == ".mp3") {
@@ -211,11 +224,35 @@ struct playlist {
                     continue;
                 }
                 cout << "재생 중 (MP3): " << song << endl;
+                
+                // 재생 시간 가져오기
+                sf::Time duration = mp3.getDuration();
                 mp3.play();
+                sf::Time elapsedTime = sf::Time::Zero;
 
                 while (mp3.getStatus() == sf::SoundStream::Playing) {
-                    sf::sleep(sf::milliseconds(100));
+                // 남은 시간 계산
+                elapsedTime += sf::milliseconds(1000); // 1초씩 경과 시간 증가
+                sf::Time remainingTime = duration - elapsedTime;
+
+                // 분과 초로 현재 시간과 총 시간 출력
+                int elapsedMinutes = static_cast<int>(elapsedTime.asSeconds()) / 60;
+                int elapsedSeconds = static_cast<int>(elapsedTime.asSeconds()) % 60;
+                int totalMinutes = static_cast<int>(duration.asSeconds()) / 60;
+                int totalSeconds = static_cast<int>(duration.asSeconds()) % 60;
+
+                cout << "현재 재생 시간: " << elapsedMinutes << ":" << elapsedSeconds
+                     << " / 총 재생 시간: " << totalMinutes << ":" << totalSeconds << endl;
+
+                sf::sleep(sf::milliseconds(1000)); // 1초 대기
                 }
+            }
+
+            ++it; // 반복자 이동
+
+            // 마지막 노드에 도달했을 때, 처음으로 돌아감
+            if (it == songs.end()) {
+                it = songs.begin();
             }
         }
     }
@@ -241,7 +278,7 @@ vector<string> getAudioFiles(const string& directory) {
     }
     closedir(dp);
 
-    // sort(audioFiles.begin(), audioFiles.end());
+    sort(audioFiles.begin(), audioFiles.end());
     return audioFiles;
 }
 
@@ -256,7 +293,6 @@ int main() {
         pl.insert(file);
     }
 
-    cout << "재생 목록:" << endl;
     pl.playAll();
 
     return 0;
